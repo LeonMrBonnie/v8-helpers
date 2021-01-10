@@ -132,22 +132,30 @@ v8::Local<v8::Value> V8ResourceImpl::CreateRGBA(alt::RGBA rgba)
 
 bool V8ResourceImpl::IsVector3(v8::Local<v8::Value> val)
 {
-	return val->InstanceOf(GetContext(), vector3Class.Get(isolate)).ToChecked();
+	bool out;
+	if(!val->InstanceOf(GetContext(), vector3Class.Get(isolate)).To(&out)) return false;
+	else return out;
 }
 
 bool V8ResourceImpl::IsVector2(v8::Local<v8::Value> val)
 {
-	return val->InstanceOf(GetContext(), vector2Class.Get(isolate)).ToChecked();
+	bool out;
+	if(!val->InstanceOf(GetContext(), vector2Class.Get(isolate)).To(&out)) return false;
+	else return out;
 }
 
 bool V8ResourceImpl::IsRGBA(v8::Local<v8::Value> val)
 {
-	return val->InstanceOf(GetContext(), rgbaClass.Get(isolate)).ToChecked();
+	bool out;
+	if(!val->InstanceOf(GetContext(), rgbaClass.Get(isolate)).To(&out)) return false;
+	else return out;
 }
 
 bool V8ResourceImpl::IsBaseObject(v8::Local<v8::Value> val)
 {
-	return val->InstanceOf(GetContext(), baseObjectClass.Get(isolate)).ToChecked();
+	bool out;
+	if(!val->InstanceOf(GetContext(), baseObjectClass.Get(isolate)).To(&out)) return false;
+	else return out;
 }
 
 void V8ResourceImpl::OnCreateBaseObject(alt::Ref<alt::IBaseObject> handle)
