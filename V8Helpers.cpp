@@ -90,7 +90,7 @@ void V8Helpers::FunctionCallback(const v8::FunctionCallbackInfo<v8::Value>& info
 	info.GetReturnValue().Set(V8Helpers::MValueToV8(res));
 }
 
-alt::MValue V8Helpers::V8ToMValue(v8::Local<v8::Value> val)
+alt::MValue V8Helpers::V8ToMValue(v8::Local<v8::Value> val, v8::Local<v8::Value> oldVal)
 {
 	auto& core = alt::ICore::Instance();
 
@@ -199,10 +199,12 @@ alt::MValue V8Helpers::V8ToMValue(v8::Local<v8::Value> val)
 				for (uint32_t i = 0; i < keys->Length(); ++i)
 				{
 					v8::Local<v8::Value> v8Key = keys->Get(ctx, i).ToLocalChecked();
-					if (!v8Obj->Get(ctx, v8Key).ToLocalChecked()->IsUndefined())
+					v8::Local<v8::Value> v8Value = v8Obj->Get(ctx, v8Key).ToLocalChecked();
+
+					if (!v8Value->IsUndefined() && !v8Value->StrictEquals(v8Obj) && (oldVal.IsEmpty() || !v8Value->StrictEquals(oldVal)))
 					{
 						std::string key = *v8::String::Utf8Value(isolate, v8Key->ToString(ctx).ToLocalChecked());
-						dict->Set(key, V8ToMValue(v8Obj->Get(ctx, v8Key).ToLocalChecked()));
+						dict->Set(key, V8ToMValue(v8Obj->Get(ctx, v8Key).ToLocalChecked(), val));
 					}
 				}
 

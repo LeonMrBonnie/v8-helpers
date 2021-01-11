@@ -73,7 +73,7 @@ namespace V8Helpers
 
 	void FunctionCallback(const v8::FunctionCallbackInfo<v8::Value> &info);
 
-	alt::MValue V8ToMValue(v8::Local<v8::Value> val);
+	alt::MValue V8ToMValue(v8::Local<v8::Value> val, v8::Local<v8::Value> oldVal = v8::Local<v8::Value>());
 
 	v8::Local<v8::Value> MValueToV8(alt::MValueConst val);
 
