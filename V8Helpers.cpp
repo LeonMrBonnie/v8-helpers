@@ -90,7 +90,7 @@ void V8Helpers::FunctionCallback(const v8::FunctionCallbackInfo<v8::Value>& info
 	info.GetReturnValue().Set(V8Helpers::MValueToV8(res));
 }
 
-alt::MValue V8Helpers::V8ToMValue(v8::Local<v8::Value> val, std::unordered_set<v8::Local<v8::Value>> oldVals)
+alt::MValue V8Helpers::V8ToMValue(v8::Local<v8::Value> val, std::vector<v8::Local<v8::Value>> oldVals)
 {
 	auto& core = alt::ICore::Instance();
 
@@ -215,7 +215,7 @@ alt::MValue V8Helpers::V8ToMValue(v8::Local<v8::Value> val, std::unordered_set<v
 						}
 						if(isCircular) continue;
 						std::string key = *v8::String::Utf8Value(isolate, v8Key->ToString(ctx).ToLocalChecked());
-						oldVals.emplace(v8Value);
+						oldVals.emplace_back(v8Value);
 						dict->Set(key, V8ToMValue(v8Value, oldVals));
 					}
 				}
