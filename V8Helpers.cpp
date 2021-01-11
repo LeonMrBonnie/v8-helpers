@@ -90,7 +90,7 @@ void V8Helpers::FunctionCallback(const v8::FunctionCallbackInfo<v8::Value>& info
 	info.GetReturnValue().Set(V8Helpers::MValueToV8(res));
 }
 
-alt::MValue V8Helpers::V8ToMValue(v8::Local<v8::Value> val, v8::Local<v8::Value> oldVal)
+alt::MValue V8Helpers::V8ToMValue(v8::Local<v8::Value> val, std::unordered_set<v8::Local<v8::Value>> oldVals)
 {
 	auto& core = alt::ICore::Instance();
 
@@ -201,10 +201,22 @@ alt::MValue V8Helpers::V8ToMValue(v8::Local<v8::Value> val, v8::Local<v8::Value>
 					v8::Local<v8::Value> v8Key = keys->Get(ctx, i).ToLocalChecked();
 					v8::Local<v8::Value> v8Value = v8Obj->Get(ctx, v8Key).ToLocalChecked();
 
-					if (!v8Value->IsUndefined() && !v8Value->StrictEquals(v8Obj) && (oldVal.IsEmpty() || !v8Value->StrictEquals(oldVal)))
+					if (!v8Value->IsUndefined() && !v8Value->StrictEquals(v8Obj))
 					{
+						bool isCircular = false;
+						for(auto oldVal : oldVals)
+						{
+							if(oldVal.IsEmpty()) continue;
+							if(v8Value->StrictEquals(oldVal))
+							{
+								isCircular = true;
+								break;
+							}
+						}
+						if(isCircular) continue;
 						std::string key = *v8::String::Utf8Value(isolate, v8Key->ToString(ctx).ToLocalChecked());
-						dict->Set(key, V8ToMValue(v8Obj->Get(ctx, v8Key).ToLocalChecked(), val));
+						oldVals.emplace(v8Value);
+						dict->Set(key, V8ToMValue(v8Value, oldVals));
 					}
 				}
 
